@@ -6,17 +6,17 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "CRC16.h"
+#include "parameters.h"
 #include <WiFiClient.h>
 
 //===Change values from here===
-const char* ssid = "WIFISSID";
-const char* password = "PASSWORD";
-const char* hostName = "ESPP1Meter";
-const char* domoticzIP = "192.168.1.35";
-const int domoticzPort = 8090;
+
 const int domoticzGasIdx = 291;
 const int domoticzEneryIdx = 294;
 const bool outputOnSerial = true;
+
+const char* hostName = "ESPP1Meter";
+
 //===Change values to here===
 
 // Vars to store meter readings
@@ -40,17 +40,11 @@ unsigned int currentCRC=0;
 
 WiFiClient wifiClient;
 
-void SendToDomoLog(char* message)
-{
-  char url[512];
-  sprintf(url, "http://%s:%d/json.htm?type=command&param=addlogmessage&message=%s", domoticzIP, domoticzPort, message); 
-}
-
 void setup() {
   Serial.begin(115200);
   Serial.println("Booting");
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(wifissid, wifipassword);
 
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     Serial.println("Connection Failed! Rebooting...");

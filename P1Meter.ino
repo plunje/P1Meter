@@ -6,6 +6,7 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "CRC16.h"
+#include <WiFiClient.h>
 
 //===Change values from here===
 const char* ssid = "WIFISSID";
@@ -36,6 +37,8 @@ char telegram[MAXLINELENGTH];
 SoftwareSerial mySerial(SERIAL_RX, -1, true); // (RX, TX. inverted, buffer)
 
 unsigned int currentCRC=0;
+
+WiFiClient wifiClient;
 
 void SendToDomoLog(char* message)
 {
@@ -96,7 +99,7 @@ bool SendToDomo(int idx, int nValue, char* sValue)
   char url[255];
   sprintf(url, "http://%s:%d/json.htm?type=command&param=udevice&idx=%d&nvalue=%d&svalue=%s", domoticzIP, domoticzPort, idx, nValue, sValue);
   Serial.printf("[HTTP] GET... URL: %s\n",url);
-  http.begin(url); //HTTP
+  http.begin(wifiClient, url); //HTTP
   int httpCode = http.GET();
   // httpCode will be negative on error
   if (httpCode > 0)

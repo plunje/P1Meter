@@ -11,8 +11,8 @@
 
 //===Change values from here===
 
-const int domoticzGasIdx = 291;
-const int domoticzEneryIdx = 294;
+const int gasIdx = 291;
+const int electricityIdx = 294;
 const bool outputOnSerial = true;
 
 const char* hostName = "ESPP1Meter";
@@ -86,44 +86,36 @@ void setup() {
 }
 
 
-bool SendToDomo(int idx, int nValue, char* sValue)
-{
-  HTTPClient http;
-  bool retVal = false;
-  char url[255];
-  sprintf(url, "http://%s:%d/json.htm?type=command&param=udevice&idx=%d&nvalue=%d&svalue=%s", domoticzIP, domoticzPort, idx, nValue, sValue);
-  Serial.printf("[HTTP] GET... URL: %s\n",url);
-  http.begin(wifiClient, url); //HTTP
-  int httpCode = http.GET();
-  // httpCode will be negative on error
-  if (httpCode > 0)
-  { // HTTP header has been send and Server response header has been handled
-    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+bool PostToApi(int idx, int nValue, char* sValue) {
+  if (!wifiClient.connect(apiEndPoint, apiPort)) {
+    Serial.println("connection failed");
+    return false;
+  }
 
-    // file found at server
-    if (httpCode == HTTP_CODE_OK) {
-      String payload = http.getString();
-      retVal = true;
-    }
-  }
-  else
-  {
-    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-  }
-  http.end();
-  return retVal;
+  HTTPClient httpclient;
+
+  httpclient.begin(wifiClient, apiEndPoint, apiPort);
+
+  // Specify content-type header
+  httpclient.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  
+  // Data to send with HTTP POST
+  char httpRequestData[512];
+  sprintf(httpRequestData, "type=command&param=udevice&idx=%d&nvalue=%d&svalue=%s", idx, nValue, sValue);
+
+  // Send HTTP POST request
+  int httpResponseCode = httpclient.POST(httpRequestData);
+
+  return true;
 }
-
-
 
 void UpdateGas()
 {
-  //sends over the gas setting to domoticz
   if(prevGAS!=mGAS)
   {
     char sValue[10];
     sprintf(sValue, "%d", mGAS);
-    if(SendToDomo(domoticzGasIdx, 0, sValue))
+    if(PostToApi(gasIdx, 0, sValue))
       prevGAS=mGAS;
   }
 }
@@ -132,7 +124,7 @@ void UpdateElectricity()
 {
   char sValue[255];
   sprintf(sValue, "%d;%d;%d;%d;%d;%d", mEVLT, mEVHT, mEOLT, mEOHT, mEAV, mEAT);
-  SendToDomo(domoticzEneryIdx, 0, sValue);
+  PostToApi(electricityIdx, 0, sValue);
 }
 
 

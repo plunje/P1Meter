@@ -1,5 +1,5 @@
-const char* domoticzIP = "192.168.1.35";
-const int domoticzPort = 8090;
+const char* apiEndPoint = "apiEndPoint";
+const int apiPort = 443;
 
 const char* wifissid = "WIFISSID";
 const char* wifipassword = "PASSWORD";

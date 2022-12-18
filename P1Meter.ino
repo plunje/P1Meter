@@ -33,7 +33,7 @@ long prevGAS = 0;
 char telegram[MAXLINELENGTH];
 
 #define SERIAL_RX     D5  // pin for SoftwareSerial RX
-SoftwareSerial mySerial(SERIAL_RX, -1, true, MAXLINELENGTH); // (RX, TX. inverted, buffer)
+SoftwareSerial mySerial(SERIAL_RX, -1, true); // (RX, TX. inverted, buffer)
 
 unsigned int currentCRC=0;
 

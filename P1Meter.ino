@@ -97,14 +97,11 @@ bool PostToApi(int idx, int nValue, char* sValue) {
   httpclient.begin(wifiClient, apiEndPoint, apiPort);
 
   // Specify content-type header
-  httpclient.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  httpclient.addHeader("x-functions-key", apiKey);
+  httpclient.addHeader("Content-Type", "application/json");
   
-  // Data to send with HTTP POST
-  char httpRequestData[512];
-  sprintf(httpRequestData, "type=command&param=udevice&idx=%d&nvalue=%d&svalue=%s", idx, nValue, sValue);
-
   // Send HTTP POST request
-  int httpResponseCode = httpclient.POST(httpRequestData);
+  int httpResponseCode = httpclient.POST("{\"data\": \"test789\"}");
 
   return true;
 }
